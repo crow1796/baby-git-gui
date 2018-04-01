@@ -1,11 +1,11 @@
 import React from 'react'
-import Hello from '@/containers/Hello'
+import BabyGit from '@/containers/BabyGit'
 
 export default class App extends React.Component {
 	render(){
 		return (
 			<div id="app">
-				<Hello/>
+				<BabyGit/>
 			</div>
 		)
 	}

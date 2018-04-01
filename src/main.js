@@ -1,9 +1,11 @@
-const { app, BrowserWindow, ipcMain } = require('electron')
+const { app, BrowserWindow, Tray, Menu } = require('electron')
 
 const path = require('path')
 const url = require('url')
 const isDev = require('electron-is-dev')
-require('electron-reload')(__dirname)
+require('electron-reload')(__dirname, {
+    electron: require('electron-prebuilt')
+})
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -11,7 +13,17 @@ let mainWindow
 
 function createWindow () {
     // Create the browser window.
-    mainWindow = new BrowserWindow({width: 800, height: 600, show: false})
+    mainWindow = new BrowserWindow({
+        width: 400, 
+        height: 381,
+        maxwidth: 400,
+        maxheight: 381, 
+        minwidth: 400,
+        minheight: 381, 
+        show: false,
+        maximizable: false,
+        resizable: false
+    })
     let content = isDev ? 'http://localhost:3000' : url.format({
         pathname: path.join(path.dirname(__dirname), 'public/index.html'),
         protocol: 'file:',
@@ -21,6 +33,29 @@ function createWindow () {
     mainWindow.loadURL(content);
     mainWindow.once('ready-to-show', () => mainWindow.show())
     mainWindow.webContents.openDevTools();
+
+    let tray;
+    let trayMenu = [
+        {
+            label: 'Show/Hide',
+            click: () => {
+                tray.destroy()
+                tray = null
+                mainWindow.show()
+                mainWindow.setMaximizable(false)
+                mainWindow.setResizable(false)
+            }
+        },
+        { role: 'quit' }
+    ]
+    mainWindow.on('minimize', (e) => {
+        tray = new Tray(path.join(path.dirname(__dirname), 'public/tray.png'))
+        tray.setToolTip('Baby Git v2')
+        tray.setContextMenu(Menu.buildFromTemplate(trayMenu))
+        mainWindow.hide()
+        mainWindow.setMaximizable(false)
+        mainWindow.setResizable(false)
+    })
 
     // Open the DevTools.
     // mainWindow.webContents.openDevTools()

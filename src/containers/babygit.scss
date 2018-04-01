@@ -1,0 +1,135 @@
+body {
+    font-size: 62.5%;
+    background: #dadada;
+    font-family: 'Open Sans', sans-serif;
+    line-height: 2;
+    padding: 0;
+    margin: 0 ;
+}
+
+body::-webkit-scrollbar {
+    width: 6px;
+    padding: 0 2px;
+}
+
+body::-webkit-scrollbar-track {
+    background: #878788;
+    border-radius: 5px;
+}
+
+body::-webkit-scrollbar-thumb {
+    background: #404040;
+    border-radius: 5px;
+}
+
+.accordion {
+    font-size: 1rem;
+    width: 30vw;
+    margin: 0 auto;
+    border-radius: 5px;
+}
+
+.accordion-header,
+.accordion-body {
+    background: white;
+}
+
+.accordion-header {
+    padding: 1.5em 1.5em;
+    background: #3F51B5;
+    text-transform: uppercase;
+    color: white;
+    cursor: pointer;
+    font-size: .8em;
+    letter-spacing: .1em;
+    transition: all .3s;
+}
+
+.accordion-header:hover {
+    background: #2D3D99;
+    position: relative;
+    z-index: 5;
+}
+
+.accordion-body {
+    background: #fcfcfc;
+    color: #3f3c3c;
+    display: none;
+}
+
+.accordion-body__contents {
+    font-size: .85em;
+    height: 46.91px
+}
+
+.accordion__item.active:last-child .accordion-header {
+    border-radius: none;
+}
+
+.accordion:first-child>.accordion__item>.accordion-header {
+    border-bottom: 1px solid transparent;
+}
+
+.accordion__item>.accordion-header:after {
+    content: "\2193";
+    font-size: 1.2em;
+    float: right;
+    position: relative;
+    top: -2px;
+    transition: .3s all;
+    transform: rotate(0deg);
+}
+
+.accordion__item.active>.accordion-header:after {
+    transform: rotate(-180deg);
+}
+
+.accordion__item.active .accordion-header {
+    background: #2D3D99;
+}
+
+.accordion__item .accordion__item .accordion-header {
+    background: #f1f1f1;
+    color: black;
+}
+
+.environment-group{
+    & > .field{
+        margin: 0;
+        padding: 1em;
+        border: 0;
+        width: 60%;
+        font-size: 1.1em;
+        outline: 0;
+        display: inline-block;
+    }
+
+    & > .button,
+    & > .button:focus{
+        width: 32.4%;
+        padding: 0;
+        margin: 0;
+        border: 0;
+        height: 46.91px;
+        vertical-align: top;
+        color: white;
+        text-align: center;
+        background-color: #3f51b5;
+        outline: 0;
+        cursor: pointer;
+    }
+
+    & > .button:hover,
+    & > .button:active{
+        background-color: #2D3D99;
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    body {
+        padding: 0;
+    }
+    .accordion {
+        width: 100%;
+    }
+}
