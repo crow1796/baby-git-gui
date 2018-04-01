@@ -110,9 +110,9 @@ class BabyGit extends React.Component {
     handleChange(e, projectKey, key){
         let newVal = this.state.projects
         if (e.target.getAttribute('type') === 'checkbox') {
-            newVal[projectKey][key] = e.target.checked
+            newVal[projectKey].environments[key].branch = e.target.checked
         } else {
-            newVal[projectKey][key] = e.target.value
+            newVal[projectKey].environments[key].branch = e.target.value
         }
         this.setState({
             projects: newVal
@@ -120,13 +120,10 @@ class BabyGit extends React.Component {
     }
 
     checkOut(projectKey, key){
-        console.log(this.state.projects[projectKey][key])
-        // url + ":807/repo/deploy/add/" + ss.api_key + "/" + project + "/" + branch + "/"
-        // if (event.target.getAttribute('type') === 'checkbox') {
-        //     this.setState({ [event.target.getAttribute('name')]: event.target.checked });
-        // } else {
-        //     this.setState({ [event.target.getAttribute('name')]: event.target.value });
-        // }
+        let url = this.state.projects[projectKey].environments[key].url
+        let branch = this.state.projects[projectKey].environments[key].branch
+        url = url + ":807/repo/deploy/add/" + this.props.apiKey + "/" + this.state.projects[projectKey].name + "/" + branch + "/"
+        console.log(url)
     }
 
     render(){
@@ -141,9 +138,6 @@ class BabyGit extends React.Component {
 function mapStateToProps(state){
     return {
         apiKey: state.babygit.apiKey,
-        devUrl: state.babygit.devUrl,
-        stagingUrl: state.babygit.stagingUrl,
-        testUrl: state.babygit.testUrl,
         projects: state.babygit.projects
     }
 }

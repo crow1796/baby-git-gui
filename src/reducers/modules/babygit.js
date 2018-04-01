@@ -1,19 +1,25 @@
 import * as Types from '@/actions/types/babygit'
 
 const initialState = {
-    devUrl: "35.166.185.17:807/",
-    stagingUrl: "52.41.155.173:807/",
-    testUrl: "35.160.50.252:807/",
     apiKey: "rjdjna88Haasd2340UjdEasjdl00999231dUjJJJdad",
     projects: {
         'lfu': {
             name: 'LawFormsUSA',
             environments: {
                 "dev": {
-                    name: "Dev"
+                    name: "Dev",
+                    url: 'http://35.166.185.17:807/',
+                    branch: ''
                 },
                 "staging": {
-                    name: 'Staging'
+                    name: 'Staging',
+                    url: 'http://52.41.155.173:807/',
+                    branch: ''
+                },
+                "test": {
+                    name: 'Test',
+                    url: 'http://35.160.50.252:807/',
+                    branch: ''
                 }
             }
         },
@@ -21,10 +27,19 @@ const initialState = {
             name: 'PDFRun',
             environments: {
                 "dev": {
-                    name: "Dev"
+                    name: "Dev",
+                    url: 'http://35.166.185.17:807/',
+                    branch: ''
                 },
                 "staging": {
-                    name: 'Staging'
+                    name: 'Staging',
+                    url: 'http://52.41.155.173:807/',
+                    branch: ''
+                },
+                "test": {
+                    name: 'Test',
+                    url: 'http://35.160.50.252:807/',
+                    branch: ''
                 }
             }
         },
@@ -32,10 +47,19 @@ const initialState = {
             name: 'PassportUSA',
             environments: {
                 "dev": {
-                    name: "Dev"
+                    name: "Dev",
+                    url: 'http://35.166.185.17:807/',
+                    branch: ''
                 },
                 "staging": {
-                    name: 'Staging'
+                    name: 'Staging',
+                    url: 'http://52.41.155.173:807/',
+                    branch: ''
+                },
+                "test": {
+                    name: 'Test',
+                    url: 'http://35.160.50.252:807/',
+                    branch: ''
                 }
             }
         },
@@ -43,10 +67,19 @@ const initialState = {
             name: 'PDFFormPro',
             environments: {
                 "dev": {
-                    name: "Dev"
+                    name: "Dev",
+                    url: 'http://35.166.185.17:807/',
+                    branch: ''
                 },
                 "staging": {
-                    name: 'Staging'
+                    name: 'Staging',
+                    url: 'http://52.41.155.173:807/',
+                    branch: ''
+                },
+                "test": {
+                    name: 'Test',
+                    url: 'http://35.160.50.252:807/',
+                    branch: ''
                 }
             }
         },
@@ -54,10 +87,19 @@ const initialState = {
             name: 'Oill.io',
             environments: {
                 "dev": {
-                    name: "Dev"
+                    name: "Dev",
+                    url: 'http://35.166.185.17:807/',
+                    branch: ''
                 },
                 "staging": {
-                    name: 'Staging'
+                    name: 'Staging',
+                    url: 'http://52.41.155.173:807/',
+                    branch: ''
+                },
+                "test": {
+                    name: 'Test',
+                    url: 'http://35.160.50.252:807/',
+                    branch: ''
                 }
             }
         },
@@ -65,7 +107,9 @@ const initialState = {
             name: 'WebForms',
             environments: {
                 "dev": {
-                    name: "Dev"
+                    name: "Dev",
+                    url: 'http://35.166.185.17:807/',
+                    branch: ''
                 }
             }
         }
