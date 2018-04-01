@@ -6,6 +6,9 @@ import './babygit.scss'
 class BabyGit extends React.Component {
     constructor(props){
         super(props)
+        this.state = {
+            projects: this.props.projects
+        }
     }
 
     componentDidMount(){
@@ -71,7 +74,7 @@ class BabyGit extends React.Component {
                         <div className="accordion-header js-accordion-header">{ project.name }</div>
                         <div className="accordion-body js-accordion-body">
                             <div className="accordion js-accordion">
-                                { this.renderEnvironmentsOf(project) }
+                                { this.renderEnvironmentsOf(project, key) }
                             </div>
                         </div>
                     </div>
@@ -80,7 +83,7 @@ class BabyGit extends React.Component {
         })
     }
 
-    renderEnvironmentsOf(project){
+    renderEnvironmentsOf(project, projectKey){
         return _.map(project.environments, (environment, key) => {
             return (
                 <div className="accordion__item js-accordion-item" key={ key }>
@@ -88,8 +91,12 @@ class BabyGit extends React.Component {
                     <div className="accordion-body js-accordion-body">
                         <div className="accordion-body__contents">
                             <div className="environment-group">
-                                <input type="text" className="field" placeholder="Enter Branch Name" />
-                                <button type="button" className="button">
+                                <input type="text" 
+                                className="field" 
+                                placeholder="Enter Branch Name"
+                                name={ key }
+                                onChange={(e) => this.handleChange(e, projectKey, key) }/>
+                                <button type="button" className="button" onClick={(e) => this.checkOut(projectKey, key) }>
                                     Checkout
                                 </button>
                             </div>
@@ -98,6 +105,28 @@ class BabyGit extends React.Component {
                 </div>
             )
         })
+    }
+
+    handleChange(e, projectKey, key){
+        let newVal = this.state.projects
+        if (e.target.getAttribute('type') === 'checkbox') {
+            newVal[projectKey][key] = e.target.checked
+        } else {
+            newVal[projectKey][key] = e.target.value
+        }
+        this.setState({
+            projects: newVal
+        })
+    }
+
+    checkOut(projectKey, key){
+        console.log(this.state.projects[projectKey][key])
+        // url + ":807/repo/deploy/add/" + ss.api_key + "/" + project + "/" + branch + "/"
+        // if (event.target.getAttribute('type') === 'checkbox') {
+        //     this.setState({ [event.target.getAttribute('name')]: event.target.checked });
+        // } else {
+        //     this.setState({ [event.target.getAttribute('name')]: event.target.value });
+        // }
     }
 
     render(){
@@ -111,6 +140,10 @@ class BabyGit extends React.Component {
 
 function mapStateToProps(state){
     return {
+        apiKey: state.babygit.apiKey,
+        devUrl: state.babygit.devUrl,
+        stagingUrl: state.babygit.stagingUrl,
+        testUrl: state.babygit.testUrl,
         projects: state.babygit.projects
     }
 }
