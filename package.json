@@ -11,11 +11,14 @@
   },
   "dependencies": {
     "axios": "^0.18.0",
+    "firebase": "^4.12.1",
     "jquery": "^3.3.1",
     "react": "^16.3.0",
     "react-dom": "^16.3.0",
     "react-redux": "^5.0.7",
-    "redux": "^3.7.2"
+    "react-toastify": "^3.4.3",
+    "redux": "^3.7.2",
+    "redux-promise": "^0.5.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

@@ -1,14 +1,23 @@
 import React from 'react'
 import { connect } from 'react-redux'
 import { bindActionCreators } from 'redux'
+import { ToastContainer, toast } from 'react-toastify';
+import { css } from 'glamor';
+import * as Actions from '@/actions/babygit'
 import './babygit.scss'
 
 class BabyGit extends React.Component {
     constructor(props){
         super(props)
         this.state = {
-            projects: this.props.projects
+            projects: {}
         }
+        this.props.getAllProjects()
+            .then((response) => {
+                this.setState({
+                    projects: response.payload.projects
+                })
+            })
     }
 
     componentDidMount(){
@@ -67,7 +76,7 @@ class BabyGit extends React.Component {
     }
 
     renderProjects(){
-        return _.map(this.props.projects, (project, key) => {
+        return _.map(this.state.projects, (project, key) => {
             return (
                 <div className="accordion js-accordion" key={ key }>
                     <div className="accordion__item js-accordion-item">
@@ -122,13 +131,39 @@ class BabyGit extends React.Component {
     checkOut(projectKey, key){
         let url = this.state.projects[projectKey].environments[key].url
         let branch = this.state.projects[projectKey].environments[key].branch
-        url = url + ":807/repo/deploy/add/" + this.props.apiKey + "/" + this.state.projects[projectKey].name + "/" + branch + "/"
-        console.log(url)
+        if(!branch){
+            toast.error("Please enter a branch name.", {
+                position: toast.POSITION.TOP_CENTER,
+                closeButton: false,
+                hideProgressBar: true,
+                className: '-toast'
+            })
+            return false
+        }
+        url = url + "repo/deploy/add/" + this.props.apiKey + "/" + this.state.projects[projectKey].name + "/" + branch + "/"
+        axios.get(url)
+            .then((response) => {
+                toast.error('Success', {
+                    position: toast.POSITION.TOP_CENTER,
+                    closeButton: false,
+                    hideProgressBar: true,
+                    className: '-toast'
+                })
+            })
+            .catch((response) => {
+                toast.error(`Error: ${response.message}. Please try again.`, {
+                    position: toast.POSITION.TOP_CENTER,
+                    closeButton: false,
+                    hideProgressBar: true,
+                    className: '-toast'
+                })
+            })
     }
 
     render(){
         return (
             <div id="baby-git">
+                <ToastContainer />
                 { this.renderProjects() }
             </div>
         )
@@ -142,4 +177,8 @@ function mapStateToProps(state){
     }
 }
 
-export default connect(mapStateToProps)(BabyGit)
+function mapDispatchToProps(dispatch){
+    return bindActionCreators(Actions, dispatch)
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(BabyGit)

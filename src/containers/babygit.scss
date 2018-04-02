@@ -125,6 +125,11 @@ body::-webkit-scrollbar-thumb {
     }
 }
 
+.-toast{
+    font-size: 1.5em !important;
+    text-align: center !important;
+}
+
 @media screen and (max-width: 1000px) {
     body {
         padding: 0;
