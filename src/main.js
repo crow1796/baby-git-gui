@@ -2,10 +2,12 @@ const { app, BrowserWindow, Tray, Menu } = require('electron')
 
 const path = require('path')
 const url = require('url')
-const isDev = require('electron-is-dev')
-require('electron-reload')(__dirname, {
-    electron: require('electron-prebuilt')
-})
+const isDev = process.env.NODE_ENV == 'development'
+if(isDev){
+    require('electron-reload')(__dirname, {
+        electron: require('electron-prebuilt')
+    })
+}
 
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
@@ -31,8 +33,9 @@ function createWindow () {
     })
     // and load the index.html of the app.
     mainWindow.loadURL(content);
+    mainWindow.setMenu(null)
     mainWindow.once('ready-to-show', () => mainWindow.show())
-    mainWindow.webContents.openDevTools();
+    if (isDev) mainWindow.webContents.openDevTools();
 
     let tray;
     let trayMenu = [
