@@ -21,3 +21,11 @@ export function updateBranch(project, env, branch){
         payload: ref
     }
 }
+
+export function lockEnvOf(project, env, newVal){
+    let ref = firebase.database().ref(`projects/${project}/environments/${env}`).update({ is_locked: newVal })
+    return {
+        type: Types.LOCK_ENV,
+        payload: ref
+    }
+}

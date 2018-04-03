@@ -102,6 +102,18 @@ class BabyGit extends React.Component {
         })
     }
 
+    renderCheckoutButtonOf(projectKey, environment, key){
+        if (environment.is_locked) return ''
+        return (
+            <button
+                type="button"
+                className="button"
+                onClick={(e) => this.checkOut(environment.domain, projectKey, key)}>
+                Checkout
+            </button>
+        )
+    }
+
     renderEnvironmentsOf(project, projectKey){
         return _.map(project.environments, (environment, key) => {
             return (
@@ -117,18 +129,24 @@ class BabyGit extends React.Component {
                                 placeholder="Enter Branch Name"
                                 name={ key }
                                 value={ this.state.projects[projectKey].environments[key].branch }
-                                onChange={(e) => this.handleChange(e, projectKey, key) }/>
-                                <button type="button" className="button" onClick={(e) => this.lockEnv(e, projectKey, key)}>
-                                    <div className="icon-lock -unlocked">
+                                onChange={(e) => this.handleChange(e, projectKey, key) }
+                                disabled={ environment.is_locked }/>
+                                <button type="button" 
+                                    className={environment.is_locked ? 'button -is-white -fill' : 'button -is-white' } 
+                                onClick={(e) => this.lockEnvOf(e, projectKey, key)}>
+                                    < div className = {
+                                        environment.is_locked ? 'icon-lock' : 'icon-lock -unlocked'
+                                    } >
                                         <div className="lock-top-1"></div>
                                         <div className="lock-top-2"></div>
                                         <div className="lock-body"></div>
                                         <div className="lock-hole"></div>
                                     </div>
+                                    <span className="user-name">
+                                        Joshua
+                                    </span>
                                 </button>
-                                <button type="button" className="button" onClick={(e) => this.checkOut(environment.domain, projectKey, key) }>
-                                    Checkout
-                                </button>
+                                { this.renderCheckoutButtonOf(projectKey, environment, key) }
                             </div>
                         </div>
                     </div>
@@ -174,16 +192,33 @@ class BabyGit extends React.Component {
         }
     }
 
-    lockEnv(e, projectKey, key){
+    lockEnvOf(e, projectKey, env){
         e.stopPropagation()
-        console.log(projectKey, key)
+        this.setState({ isLoading: true })
+        let tmpProjects = this.state.projects
+        tmpProjects[projectKey].environments[env].is_locked = !tmpProjects[projectKey].environments[env].is_locked
+        this.props.lockEnvOf(projectKey, env, tmpProjects[projectKey].environments[env].is_locked)
+        this.setState({
+            projects: tmpProjects
+        })
+        this.setState({ isLoading: false })
     }
     
     checkOut(domain, projectKey, key){
         let url = this.state.projects[projectKey].environments[key].url
         let branch = this.state.projects[projectKey].environments[key].branch
+        let isLocked = this.state.projects[projectKey].environments[key].is_locked
         if(!branch){
             toast.error("Please enter a branch name.", {
+                position: toast.POSITION.TOP_CENTER,
+                closeButton: false,
+                hideProgressBar: true,
+                className: '-toast'
+            })
+            return false
+        }
+        if(isLocked){
+            toast.error("Environment is currently locked. Please try again later.", {
                 position: toast.POSITION.TOP_CENTER,
                 closeButton: false,
                 hideProgressBar: true,

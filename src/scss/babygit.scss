@@ -104,10 +104,10 @@ body::-webkit-scrollbar-thumb {
         outline: 0;
         display: inline-block;
     }
-
+    
     & > .button,
     & > .button:focus{
-        width: 32%;
+        width: 16.2%;
         padding: 0;
         margin: 0;
         border: 0;
@@ -123,6 +123,21 @@ body::-webkit-scrollbar-thumb {
     & > .button:hover,
     & > .button:active{
         background-color: #2D3D99;
+    }
+
+    &>.button.-is-white,
+    &>.button.-is-white:focus {
+        background-color: white;
+        color: #333;
+    }
+    
+    &>.button.-is-white:hover,
+    &>.button.-is-white:active{
+        background-color: white;
+    }
+
+    &>.button.-is-white.-fill{
+        width: 32.4%;
     }
 }
 
@@ -160,6 +175,8 @@ body::-webkit-scrollbar-thumb {
     height: 48px;
     overflow: hidden;
     transform: scale(0.5);
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .icon-lock .lock-top-1 {
@@ -238,6 +255,11 @@ body::-webkit-scrollbar-thumb {
   margin-left: -20%;
   top: 100%;
   background-color: inherit;
+}
+
+.user-name{
+    vertical-align: sub;
+    display: inline-block;
 }
 
 @media screen and (max-width: 1000px) {
