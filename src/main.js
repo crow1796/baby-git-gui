@@ -33,7 +33,6 @@ function createWindow () {
     })
     // and load the index.html of the app.
     mainWindow.loadURL(content);
-    mainWindow.setMenu(null)
     mainWindow.once('ready-to-show', () => mainWindow.show())
     if (isDev) mainWindow.webContents.openDevTools();
 

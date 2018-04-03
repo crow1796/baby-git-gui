@@ -4,7 +4,8 @@ import { bindActionCreators } from 'redux'
 import { ToastContainer, toast } from 'react-toastify';
 import { css } from 'glamor';
 import * as Actions from '@/actions/babygit'
-import './babygit.scss'
+import Rodal from 'rodal'
+import 'rodal/lib/rodal.css'
 
 class BabyGit extends React.Component {
     constructor(props){
@@ -87,7 +88,9 @@ class BabyGit extends React.Component {
             return (
                 <div className="accordion js-accordion" key={ key }>
                     <div className="accordion__item js-accordion-item">
-                        <div className="accordion-header js-accordion-header">{ project.name }</div>
+                        <div className="accordion-header js-accordion-header">
+                            { project.name }
+                        </div>
                         <div className="accordion-body js-accordion-body">
                             <div className="accordion js-accordion">
                                 { this.renderEnvironmentsOf(project, key) }
@@ -103,7 +106,9 @@ class BabyGit extends React.Component {
         return _.map(project.environments, (environment, key) => {
             return (
                 <div className="accordion__item js-accordion-item" key={ key }>
-                    <div className="accordion-header js-accordion-header">{ environment.name }</div>
+                    <div className="accordion-header js-accordion-header">
+                        { environment.name }
+                    </div>
                     <div className="accordion-body js-accordion-body">
                         <div className="accordion-body__contents">
                             <div className="environment-group">
@@ -113,6 +118,14 @@ class BabyGit extends React.Component {
                                 name={ key }
                                 value={ this.state.projects[projectKey].environments[key].branch }
                                 onChange={(e) => this.handleChange(e, projectKey, key) }/>
+                                <button type="button" className="button" onClick={(e) => this.lockEnv(e, projectKey, key)}>
+                                    <div className="icon-lock -unlocked">
+                                        <div className="lock-top-1"></div>
+                                        <div className="lock-top-2"></div>
+                                        <div className="lock-body"></div>
+                                        <div className="lock-hole"></div>
+                                    </div>
+                                </button>
                                 <button type="button" className="button" onClick={(e) => this.checkOut(environment.domain, projectKey, key) }>
                                     Checkout
                                 </button>
@@ -161,6 +174,11 @@ class BabyGit extends React.Component {
         }
     }
 
+    lockEnv(e, projectKey, key){
+        e.stopPropagation()
+        console.log(projectKey, key)
+    }
+    
     checkOut(domain, projectKey, key){
         let url = this.state.projects[projectKey].environments[key].url
         let branch = this.state.projects[projectKey].environments[key].branch

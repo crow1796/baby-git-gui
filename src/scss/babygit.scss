@@ -91,6 +91,7 @@ body::-webkit-scrollbar-thumb {
 .accordion__item .accordion__item .accordion-header {
     background: #f1f1f1;
     color: black;
+    position: relative;
 }
 
 .environment-group{
@@ -152,6 +153,91 @@ body::-webkit-scrollbar-thumb {
     svg rect{
         fill: #FF6700;
     }
+}
+
+.icon-lock {
+    width: 48px;
+    height: 48px;
+    overflow: hidden;
+    transform: scale(0.5);
+}
+
+.icon-lock .lock-top-1 {
+  width: 40%;
+  height: 40%;
+  position: absolute;
+  left: 50%;
+  margin-left: -20%;
+  top: 14%;
+  background-color: #000;
+  border-radius: 40%;
+  background-color: #3F51B5;
+}
+
+.icon-lock.-unlocked .lock-top-1{
+    left: 80%;
+    border-bottom-right-radius: 0;
+    background-color: #636363;
+}
+
+.icon-lock.-unlocked:hover .lock-top-1{
+    background-color: #2f2f2f;
+}
+
+.icon-lock .lock-top-2 {
+  width: 24%;
+  height: 40%;
+  position: absolute;
+  left: 50%;
+  margin-left: -12%;
+  top: 22%;
+  background-color: #f1f1f1;
+  border-radius: 25%;
+}
+
+.icon-lock.-unlocked .lock-top-2{
+    left: 80%;
+}
+
+.icon-lock .lock-body {
+  width: 60%;
+  height: 48%;
+  position: absolute;
+  left: 50%;
+  margin-left: -30%;
+  bottom: 11%;
+  border-radius: 15%;
+  background-color: #3F51B5;
+}
+
+.icon-lock.-unlocked .lock-body {
+  background-color: #636363;
+}
+
+.icon-lock.-unlocked:hover .lock-body{
+    background-color: #2f2f2f;
+}
+
+.icon-lock .lock-hole {
+  width: 16%;
+  height: 16%;
+  position: absolute;
+  left: 50%;
+  margin-left: -8%;
+  top: 51%;
+  border-radius: 100%;
+  background-color: #f1f1f1;
+}
+
+.icon-lock .lock-hole:after {
+  content: "";
+  width: 43%;
+  height: 78%;
+  position: absolute;
+  left: 50%;
+  margin-left: -20%;
+  top: 100%;
+  background-color: inherit;
 }
 
 @media screen and (max-width: 1000px) {

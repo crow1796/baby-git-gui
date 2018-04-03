@@ -8,7 +8,7 @@
   "scripts": {
     "postinstall": "electron-builder install-app-deps",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "dev": "cross-env NODE_ENV=\"development\" concurrently --kill-others \"webpack-dev-server --mode development --port 3000\"  \"electron .\"",
+    "dev": "cross-env NODE_ENV=\"development\" concurrently --kill-others \"webpack-dev-server --mode development --port 3000\" \"electron .\"",
     "build": "build --dir",
     "dist": "webpack --mode production && build"
   },
@@ -21,7 +21,8 @@
     "react-redux": "^5.0.7",
     "react-toastify": "^3.4.3",
     "redux": "^3.7.2",
-    "redux-promise": "^0.5.3"
+    "redux-promise": "^0.5.3",
+    "rodal": "^1.6.3"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",
@@ -37,9 +38,9 @@
     "css-loader": "^0.28.11",
     "electron": "^1.8.4",
     "electron-builder": "^20.8.1",
-    "electron-is-dev": "^0.3.0",
     "electron-prebuilt": "^1.4.13",
     "electron-reload": "^1.2.2",
+    "file-loader": "^1.1.11",
     "less": "^3.0.1",
     "less-loader": "^4.1.0",
     "node-sass": "^4.8.3",
