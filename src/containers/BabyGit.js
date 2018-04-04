@@ -57,7 +57,8 @@ class BabyGit extends React.Component {
             return {
                 // pass configurable object literal
                 init: function ($settings) {
-                    $accordion_header.on('click', function () {
+                    $accordion_header.on('click', function (e) {
+                        if (e.target.type == 'button') return
                         accordion.toggle($(this));
                     });
 
@@ -100,10 +101,15 @@ class BabyGit extends React.Component {
                     <div className="accordion__item js-accordion-item">
                         <div className="accordion-header js-accordion-header">
                             { project.name }
+                            <button type="button"
+                                className="button fetch"
+                                >&#x21BB;
+                            </button>
                         </div>
                         <div className="accordion-body js-accordion-body">
                             <div className="accordion js-accordion">
                                 { this.renderEnvironmentsOf(project, key) }
+
                             </div>
                         </div>
                     </div>
