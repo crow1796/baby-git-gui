@@ -1,0 +1,25 @@
+directories:
+  output: dist
+  buildResources: build
+appId: com.electron.bggui
+dmg:
+  contents:
+    - x: 110
+      'y': 150
+    - x: 240
+      'y': 150
+      type: link
+      path: /Applications
+mac:
+  category: public.app-category.developer-tools
+linux:
+  target:
+    - AppImage
+    - deb
+win:
+  target: portable
+files:
+  - src/main.js
+  - dist/bundle.js
+  - public/*
+electronVersion: 1.8.4

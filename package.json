@@ -22,7 +22,8 @@
     "react-toastify": "^3.4.3",
     "redux": "^3.7.2",
     "redux-promise": "^0.5.3",
-    "rodal": "^1.6.3"
+    "rodal": "^1.6.3",
+    "smalltalk": "^2.5.1"
   },
   "devDependencies": {
     "babel-cli": "^6.26.0",

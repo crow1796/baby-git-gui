@@ -7,8 +7,6 @@ const initialState = {
 
 const reducer = (state = initialState, action) => {
     switch (action.type) {
-        case Types.ALL_PROJECTS:
-            return Object.assign(state, action.payload)
         default:
             return state
     }

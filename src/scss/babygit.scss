@@ -107,7 +107,7 @@ body::-webkit-scrollbar-thumb {
     
     & > .button,
     & > .button:focus{
-        width: 16.2%;
+        width: 16%;
         padding: 0;
         margin: 0;
         border: 0;
@@ -137,7 +137,7 @@ body::-webkit-scrollbar-thumb {
     }
 
     &>.button.-is-white.-fill{
-        width: 32.4%;
+        width: 32%;
     }
 }
 
@@ -260,6 +260,60 @@ body::-webkit-scrollbar-thumb {
 .user-name{
     vertical-align: sub;
     display: inline-block;
+}
+
+.rodal-dialog{
+    width: 90% !important;
+
+    .field{
+        width: 100%;
+        padding: 10px;
+        box-sizing: border-box;
+        display: inline-block;
+        border-left: 0;
+        border-top: 0;
+        border-right: 0;
+        border-bottom: 1px solid rgba(0, 0, 0, .2);
+        outline: 0;
+    }
+
+    .button,
+    .button:focus{
+        padding: 10px 15px;
+        border-radius: 5px;
+        border: 0;
+        margin-top: 10px;
+        width: 100%;
+        background-color: #3F51B5;
+        color: white;
+        text-transform: uppercase;
+        font-weight: 300;
+        font-family: 'Open Sans';
+        letter-spacing: 2px;
+        outline: 0;
+        cursor: pointer;
+    }
+
+    .button:hover,
+    .button:active{
+        background-color: #2D3D99;
+    }
+}
+
+.tag{
+    display: inline-block;
+    font-size: .8em;
+    background: #2d3d99;
+    border-radius: 3px;
+    width: 70px;
+    text-align: center;
+    color: white;
+    vertical-align: text-bottom;
+    margin-left: 5px;
+}
+
+.accordion__item.js-accordion-item:not(:last-child) {
+    border-bottom: 1px solid rgba(0, 0, 0, 0.2);
 }
 
 @media screen and (max-width: 1000px) {

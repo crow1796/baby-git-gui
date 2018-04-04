@@ -6,26 +6,36 @@ import { css } from 'glamor';
 import * as Actions from '@/actions/babygit'
 import Rodal from 'rodal'
 import 'rodal/lib/rodal.css'
+const { session } = window.require('electron').remote
 
 class BabyGit extends React.Component {
     constructor(props){
         super(props)
         this.state = {
             isLoading: true,
-            projects: {}
+            projects: {},
+            namePrompt: false,
+            name: ''
         }
-        this.props.getAllProjects()
-            .then((response) => {
-                this.setState({
-                    isLoading: false,
-                    projects: response.payload.projects
-                })
-                this.__initAccordion()
+        let ref = firebase.database().ref()
+        ref.on('value', (snapshot) => {
+            this.setState({
+                isLoading: false,
+                projects: snapshot.val().projects
             })
+        })
+        ref.once('value', (snapshot) => this.__initAccordion())
+        this.hideNamePrompt = this.hideNamePrompt.bind(this)
+        this.handleNameChange = this.handleNameChange.bind(this)
+        this.saveName = this.saveName.bind(this)
     }
 
     componentDidMount(){
-        this.__initAccordion()
+        if (!localStorage.getItem('bbggui_name')) {
+            this.setState({
+                namePrompt: true
+            })
+        }
     }
 
     __initAccordion(){
@@ -114,12 +124,17 @@ class BabyGit extends React.Component {
         )
     }
 
+    renderInUseOf(environment){
+        if (environment.is_locked) return <span className="tag">In Use</span>
+    }
+
     renderEnvironmentsOf(project, projectKey){
         return _.map(project.environments, (environment, key) => {
             return (
                 <div className="accordion__item js-accordion-item" key={ key }>
                     <div className="accordion-header js-accordion-header">
                         { environment.name }
+                        { this.renderInUseOf(environment) }
                     </div>
                     <div className="accordion-body js-accordion-body">
                         <div className="accordion-body__contents">
@@ -143,7 +158,7 @@ class BabyGit extends React.Component {
                                         <div className="lock-hole"></div>
                                     </div>
                                     <span className="user-name">
-                                        Joshua
+                                        { environment.user }
                                     </span>
                                 </button>
                                 { this.renderCheckoutButtonOf(projectKey, environment, key) }
@@ -198,9 +213,6 @@ class BabyGit extends React.Component {
         let tmpProjects = this.state.projects
         tmpProjects[projectKey].environments[env].is_locked = !tmpProjects[projectKey].environments[env].is_locked
         this.props.lockEnvOf(projectKey, env, tmpProjects[projectKey].environments[env].is_locked)
-        this.setState({
-            projects: tmpProjects
-        })
         this.setState({ isLoading: false })
     }
     
@@ -250,12 +262,53 @@ class BabyGit extends React.Component {
             })
     }
 
+    hideNamePrompt(e){
+        this.setState({
+            namePrompt: false
+        })
+    }
+
+    handleNameChange(e){
+        this.setState({
+            name: e.target.value
+        })
+    }
+
+    saveName(e){
+        if(!this.state.name.trim()){
+            return false
+        }
+        localStorage.setItem('bbggui_name', this.state.name)
+        this.setState({
+            namePrompt: false
+        })
+    }
+
     render(){
         return (
             <div id="baby-git">
                 <ToastContainer />
                 { this.spinner() }
                 { this.renderProjects() }
+                <Rodal visible={this.state.namePrompt} 
+                    onClose={this.hideNamePrompt}
+                    showCloseButton={false}
+                    closeOnEsc={false}
+                    closeMaskOnClick={false}
+                    height={140}>
+                    <div>
+                        <h2>Please enter your name</h2>
+                        <input type="text"
+                            className="field"
+                            placeholder="Enter Your Name"
+                            onChange={ this.handleNameChange }/>
+                        <div>
+                            <button type="button" className="button" onClick={ this.saveName }>
+                                Save
+                            </button>
+                        </div>
+                    </div>
+                </Rodal>
             </div>
         )
     }
