@@ -1,7 +1,11 @@
 import * as Types from '@/actions/types/babygit'
 
 export function updateBranch(project, env, branch){
-    let ref = firebase.database().ref(`projects/${project}/environments/${env}`).update({ branch })
+    let ref = firebase.database().ref(`projects/${project}/environments/${env}`).update(
+        { 
+            branch ,
+            is_locked: true
+        })
     return {
         type: Types.UPDATE_BRANCH,
         payload: ref

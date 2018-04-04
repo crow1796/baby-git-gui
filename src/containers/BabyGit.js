@@ -157,7 +157,7 @@ class BabyGit extends React.Component {
                                         <div className="lock-body"></div>
                                         <div className="lock-hole"></div>
                                     </div>
-                                    <span className="user-name">
+                                    <span className="user-name" title={environment.user}>
                                         { environment.user }
                                     </span>
                                 </button>

@@ -260,6 +260,10 @@ body::-webkit-scrollbar-thumb {
 .user-name{
     vertical-align: sub;
     display: inline-block;
+    max-width: 65px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .rodal-dialog{
