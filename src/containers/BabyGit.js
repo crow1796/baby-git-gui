@@ -15,7 +15,8 @@ class BabyGit extends React.Component {
             isLoading: true,
             projects: {},
             namePrompt: false,
-            name: ''
+            name: '',
+            lockConfirmation: false
         }
         let ref = firebase.database().ref()
         ref.on('value', (snapshot) => {
@@ -26,6 +27,7 @@ class BabyGit extends React.Component {
         })
         ref.once('value', (snapshot) => this.__initAccordion())
         this.hideNamePrompt = this.hideNamePrompt.bind(this)
+        this.hideLockConfirmation = this.hideLockConfirmation.bind(this)
         this.handleNameChange = this.handleNameChange.bind(this)
         this.saveName = this.saveName.bind(this)
     }
@@ -209,11 +211,17 @@ class BabyGit extends React.Component {
 
     lockEnvOf(e, projectKey, env){
         e.stopPropagation()
-        this.setState({ isLoading: true })
         let tmpProjects = this.state.projects
-        tmpProjects[projectKey].environments[env].is_locked = !tmpProjects[projectKey].environments[env].is_locked
-        this.props.lockEnvOf(projectKey, env, tmpProjects[projectKey].environments[env].is_locked)
-        this.setState({ isLoading: false })
+        if (tmpProjects[projectKey].environments[env].user != localStorage.getItem('bbggui_name')){
+            this.setState({
+                lockConfirmation: true
+            })
+            return
+        }
+        // this.setState({ isLoading: true })
+        // tmpProjects[projectKey].environments[env].is_locked = !tmpProjects[projectKey].environments[env].is_locked
+        // this.props.lockEnvOf(projectKey, env, tmpProjects[projectKey].environments[env].is_locked)
+        // this.setState({ isLoading: false })
     }
     
     checkOut(domain, projectKey, key){
@@ -275,6 +283,7 @@ class BabyGit extends React.Component {
     }
 
     saveName(e){
+        e.preventDefault()
         if(!this.state.name.trim()){
             return false
         }
@@ -283,6 +292,50 @@ class BabyGit extends React.Component {
             namePrompt: false
         })
     }
+    
+    renderNamePromptModal(){
+        return (
+            <Rodal visible={this.state.namePrompt} 
+                    onClose={this.hideNamePrompt}
+                    showCloseButton={false}
+                    closeOnEsc={false}
+                    closeMaskOnClick={false}
+                    height={130}>
+                    <div>
+                        < form onSubmit = { this.saveName } >
+                            <h2>Please enter your name</h2>
+                            <input type="text"
+                                className="field"
+                                placeholder="Enter Your Name"
+                                onChange={ this.handleNameChange }/>
+                            <div>
+                                <button type="submit" className="button" onClick={ this.saveName }>
+                                    Save
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </Rodal>   
+        )
+    }
+
+    hideLockConfirmation(){
+        this.setState({
+            lockConfirmation: false
+        })
+    }
+
+    renderLockConfirmation(){
+        return (
+            <Rodal visible={this.state.lockConfirmation} 
+                    onClose={this.hideLockConfirmation}
+                    height={130}>
+                <div>
+                    <h2>Are you sure you want to unlock this env?</h2>
+                </div>
+            </Rodal>
+        )
+    }
 
     render(){
         return (
@@ -290,25 +343,8 @@ class BabyGit extends React.Component {
                 <ToastContainer />
                 { this.spinner() }
                 { this.renderProjects() }
-                <Rodal visible={this.state.namePrompt} 
-                    onClose={this.hideNamePrompt}
-                    showCloseButton={false}
-                    closeOnEsc={false}
-                    closeMaskOnClick={false}
-                    height={140}>
-                    <div>
-                        <h2>Please enter your name</h2>
-                        <input type="text"
-                            className="field"
-                            placeholder="Enter Your Name"
-                            onChange={ this.handleNameChange }/>
-                        <div>
-                            <button type="button" className="button" onClick={ this.saveName }>
-                                Save
-                            </button>
-                        </div>
-                    </div>
-                </Rodal>
+                { this.renderNamePromptModal() }
+                { this.renderLockConfirmation() }
             </div>
         )
     }
