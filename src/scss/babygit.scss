@@ -293,6 +293,7 @@ body::-webkit-scrollbar-thumb {
         margin-top: 10px;
         width: 100%;
         background-color: #3F51B5;
+        border: 1px solid #3F51B5;
         color: white;
         text-transform: uppercase;
         font-weight: 300;
@@ -322,6 +323,34 @@ body::-webkit-scrollbar-thumb {
 
 .accordion__item.js-accordion-item:not(:last-child) {
     border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+}
+
+.button{
+    &.-outlined,
+    &.-outlined:focus{
+        background-color: transparent;
+        color: #3F51B5;
+    }
+
+    &.-outlined:hover,
+    &.-outlined:active{
+        color: white;
+        background-color: #3F51B5;
+    }
+}
+
+.confirm-buttons{
+    & > .button{
+        width: 49% !important;
+    }
+
+    & > .button:not(:first-child){
+        margin-left: 1%;
+    }
+}
+
+.rodal-close{
+    top: 22px !important;
 }
 
 @media screen and (max-width: 1000px) {

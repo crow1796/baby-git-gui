@@ -6,7 +6,8 @@ import { css } from 'glamor';
 import * as Actions from '@/actions/babygit'
 import Rodal from 'rodal'
 import 'rodal/lib/rodal.css'
-const { session } = window.require('electron').remote
+const { session } = require('electron')
+let eNotify = require('electron-notify')
 
 class BabyGit extends React.Component {
     constructor(props){
@@ -16,18 +17,26 @@ class BabyGit extends React.Component {
             projects: {},
             namePrompt: false,
             name: '',
-            lockConfirmation: false
+            lockConfirmation: false,
+            lockInfo: null
         }
-        let ref = firebase.database().ref()
+        let ref = firebase.database().ref('projects')
         ref.on('value', (snapshot) => {
             this.setState({
                 isLoading: false,
-                projects: snapshot.val().projects
+                projects: snapshot.val()
             })
         })
         ref.once('value', (snapshot) => this.__initAccordion())
+
+        let envUsersRef = firebase.database().ref('env_users')
+        envUsersRef.on('value', (snapshot) => {
+            console.log(snapshot.val())
+        })
+        
         this.hideNamePrompt = this.hideNamePrompt.bind(this)
         this.hideLockConfirmation = this.hideLockConfirmation.bind(this)
+        this.confirmLocking = this.confirmLocking.bind(this)
         this.handleNameChange = this.handleNameChange.bind(this)
         this.saveName = this.saveName.bind(this)
     }
@@ -212,16 +221,17 @@ class BabyGit extends React.Component {
     lockEnvOf(e, projectKey, env){
         e.stopPropagation()
         let tmpProjects = this.state.projects
-        if (tmpProjects[projectKey].environments[env].user != localStorage.getItem('bbggui_name')){
+        if (tmpProjects[projectKey].environments[env].user != localStorage.getItem('bbggui_name') && !this.state.lockInfo && tmpProjects[projectKey].environments[env].is_locked){
             this.setState({
-                lockConfirmation: true
+                lockConfirmation: true,
+                lockInfo: {
+                    projectKey,
+                    env
+                }
             })
-            return
+            return false
         }
-        // this.setState({ isLoading: true })
-        // tmpProjects[projectKey].environments[env].is_locked = !tmpProjects[projectKey].environments[env].is_locked
-        // this.props.lockEnvOf(projectKey, env, tmpProjects[projectKey].environments[env].is_locked)
-        // this.setState({ isLoading: false })
+        this.confirmLockOf(projectKey, env)
     }
     
     checkOut(domain, projectKey, key){
@@ -321,17 +331,51 @@ class BabyGit extends React.Component {
 
     hideLockConfirmation(){
         this.setState({
-            lockConfirmation: false
+            lockConfirmation: false,
+            lockInfo: null
         })
+    }
+
+    /**
+     * Fires if 'Yes' is clicked
+     * @param {Event} e 
+     */
+    confirmLocking(e){
+        eNotify.notify({ title: 'Notification title', text: 'Some text' });
+        this.confirmLockOf(this.state.lockInfo.projectKey, this.state.lockInfo.env)
+        this.hideLockConfirmation()
+    }
+
+    confirmLockOf(projectKey, env){
+        let tmpProjects = this.state.projects
+        this.setState({
+            isLoading: true,
+            lockInfo: null
+        })
+        tmpProjects[projectKey].environments[env].is_locked = !tmpProjects[projectKey].environments[env].is_locked
+        this.props.lockEnvOf(projectKey, env, tmpProjects[projectKey].environments[env].is_locked)
+        this.setState({ isLoading: false })
     }
 
     renderLockConfirmation(){
         return (
             <Rodal visible={this.state.lockConfirmation} 
                     onClose={this.hideLockConfirmation}
-                    height={130}>
+                    height={100}>
                 <div>
                     <h2>Are you sure you want to unlock this env?</h2>
+                    <div className="confirm-buttons">
+                        <button type="button" 
+                            className="button -outlined"
+                            onClick={ this.hideLockConfirmation }>
+                            No
+                        </button>
+                        <button type="button" 
+                                className="button"
+                                onClick={ this.confirmLocking }>
+                            Yes
+                        </button>
+                    </div>
                 </div>
             </Rodal>
         )

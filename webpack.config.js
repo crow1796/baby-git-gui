@@ -5,6 +5,7 @@ module.exports = {
     entry: [
         path.join(__dirname, 'src/index.js')
     ],
+    target: "node",
     module: {
         rules: [{
             test: /\.(js|jsx)$/,
