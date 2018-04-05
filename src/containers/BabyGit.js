@@ -6,8 +6,7 @@ import { css } from 'glamor';
 import * as Actions from '@/actions/babygit'
 import Rodal from 'rodal'
 import 'rodal/lib/rodal.css'
-const { session } = require('electron')
-let eNotify = require('electron-notify')
+const { session } = window.require('electron').remote
 
 class BabyGit extends React.Component {
     constructor(props){
