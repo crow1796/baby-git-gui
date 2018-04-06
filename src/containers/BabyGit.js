@@ -31,6 +31,9 @@ class BabyGit extends React.Component {
         let envUsersRef = firebase.database().ref('env_users')
         envUsersRef.on('value', (snapshot) => {
             console.log(snapshot.val())
+            new Notification('Unlock Request', {
+                body: 'Test wants to unlock PassportUSA\'s dev environment'
+            })
         })
         
         this.hideNamePrompt = this.hideNamePrompt.bind(this)
@@ -360,9 +363,9 @@ class BabyGit extends React.Component {
         return (
             <Rodal visible={this.state.lockConfirmation} 
                     onClose={this.hideLockConfirmation}
-                    height={100}>
+                    height={130}>
                 <div>
-                    <h2>Are you sure you want to unlock this env?</h2>
+                    <h2>This env. is still in use, are you sure you want to unlock it?</h2>
                     <div className="confirm-buttons">
                         <button type="button" 
                             className="button -outlined"
