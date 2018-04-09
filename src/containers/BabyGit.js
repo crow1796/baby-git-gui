@@ -148,6 +148,7 @@ class BabyGit extends React.Component {
                     <div className="accordion-header js-accordion-header">
                         { environment.name }
                         { this.renderInUseOf(environment) }
+                        < span className="tag -is-danger">2 Requests</span>
                     </div>
                     <div className="accordion-body js-accordion-body">
                         <div className="accordion-body__contents">
@@ -175,6 +176,50 @@ class BabyGit extends React.Component {
                                     </span>
                                 </button>
                                 { this.renderCheckoutButtonOf(projectKey, environment, key) }
+                            </div>
+                            <div className="environment-requests">
+                                <div className="title">
+                                    Requests
+                                </div>
+                                <div className="user">
+                                    <div className="name">
+                                        Joshua
+                                    </div>
+                                    <div className="actions">
+                                        <button type="button" className="is-danger">
+                                            Decline
+                                        </button>
+                                        <button type="button" className="is-success">
+                                            Accept
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="user">
+                                    <div className="name">
+                                        Joshua
+                                    </div>
+                                    <div className="actions">
+                                        <button type="button" className="is-danger">
+                                            Decline
+                                        </button>
+                                        <button type="button" className="is-success">
+                                            Accept
+                                        </button>
+                                    </div>
+                                </div>
+                                <div className="user">
+                                    <div className="name">
+                                        Joshua
+                                    </div>
+                                    <div className="actions">
+                                        <button type="button" className="is-danger">
+                                            Decline
+                                        </button>
+                                        <button type="button" className="is-success">
+                                            Accept
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

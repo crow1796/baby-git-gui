@@ -59,7 +59,6 @@ body::-webkit-scrollbar-thumb {
 
 .accordion-body__contents {
     font-size: .85em;
-    height: 46.91px
 }
 
 .accordion__item.active:last-child .accordion-header {
@@ -314,11 +313,17 @@ body::-webkit-scrollbar-thumb {
     font-size: .8em;
     background: #2d3d99;
     border-radius: 3px;
-    width: 70px;
+    min-width: 70px;
+    padding: 0 5px;
     text-align: center;
     color: white;
     vertical-align: middle;
     margin-left: 5px;
+
+    &.-is-danger{
+        background-color: #ef8c13;
+    }
+    
 }
 
 .accordion__item.js-accordion-item:not(:last-child) {
@@ -352,6 +357,55 @@ body::-webkit-scrollbar-thumb {
 .rodal-close{
     right: 6px !important;
     top: 6px !important;
+}
+
+.environment-requests{
+    font-size: .9em;
+
+    & > .title{
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding: 5px;
+    }
+
+    &>.user{
+        padding: 0 10px;
+    }
+    
+    & > .user > .name{
+        display: inline-block;
+        width: 65%;
+    }
+
+    & > .user > .actions{
+        display: inline-block;
+        width: 35%;
+        text-align: right
+    }
+
+    & > .user > .actions > button{
+        border: 0;
+        height: 44px;
+        background: transparent;
+        cursor: pointer;
+        outline: 0;
+    }
+
+    & > .user > .actions >  button.is-danger {
+        color: red;
+
+        &:hover,
+        &:active{
+            color: #a90000;
+        }
+    }
+
+    & > .user > .actions > button.is-success {
+        color: green;
+        &:hover,
+        &:active {
+            color: #004200;
+        }
+    }
 }
 
 @media screen and (max-width: 1000px) {
