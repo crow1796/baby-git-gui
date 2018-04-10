@@ -29,7 +29,7 @@ class BabyGit extends React.Component {
         ref.once('value', (snapshot) => this.__initAccordion())
 
         let envUsersRef = firebase.database().ref('env_users')
-        envUsersRef.on('value', (snapshot) => {
+        envUsersRef.on('child_changed', (snapshot) => {
             console.log(snapshot.val())
             new Notification('Unlock Request', {
                 body: 'Test wants to unlock PassportUSA\'s dev environment'
