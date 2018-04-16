@@ -21,16 +21,15 @@ class BabyGit extends React.Component {
         }
         let ref = firebase.database().ref('projects')
         ref.on('value', (snapshot) => {
+            this.props.setProjects(snapshot.val())
             this.setState({
-                isLoading: false,
-                projects: snapshot.val()
+                isLoading: false
             })
         })
         ref.once('value', (snapshot) => this.__initAccordion())
 
         let envUsersRef = firebase.database().ref('env_users')
-        envUsersRef.on('child_changed', (snapshot) => {
-            console.log(snapshot.val())
+        envUsersRef.on('value', (snapshot) => {
             new Notification('Unlock Request', {
                 body: 'Test wants to unlock PassportUSA\'s dev environment'
             })
@@ -107,7 +106,7 @@ class BabyGit extends React.Component {
     }
 
     renderProjects(){
-        return _.map(this.state.projects, (project, key) => {
+        return _.map(this.props.projects, (project, key) => {
             return (
                 <div className="accordion js-accordion" key={ key }>
                     <div className="accordion__item js-accordion-item">
@@ -157,7 +156,7 @@ class BabyGit extends React.Component {
                                 className="field" 
                                 placeholder="Enter Branch Name"
                                 name={ key }
-                                value={ this.state.projects[projectKey].environments[key].branch }
+                                value={ this.props.projects[projectKey].environments[key].branch }
                                 onChange={(e) => this.handleChange(e, projectKey, key) }
                                 disabled={ environment.is_locked }/>
                                 <button type="button" 
@@ -187,10 +186,10 @@ class BabyGit extends React.Component {
                                     </div>
                                     <div className="actions">
                                         <button type="button" className="is-danger">
-                                            Decline
+                                            Remove
                                         </button>
                                         <button type="button" className="is-success">
-                                            Accept
+                                            Pass
                                         </button>
                                     </div>
                                 </div>
@@ -200,10 +199,10 @@ class BabyGit extends React.Component {
                                     </div>
                                     <div className="actions">
                                         <button type="button" className="is-danger">
-                                            Decline
+                                            Remove
                                         </button>
                                         <button type="button" className="is-success">
-                                            Accept
+                                            Pass
                                         </button>
                                     </div>
                                 </div>
@@ -213,10 +212,10 @@ class BabyGit extends React.Component {
                                     </div>
                                     <div className="actions">
                                         <button type="button" className="is-danger">
-                                            Decline
+                                            Remove
                                         </button>
                                         <button type="button" className="is-success">
-                                            Accept
+                                            Pass
                                         </button>
                                     </div>
                                 </div>
@@ -229,7 +228,7 @@ class BabyGit extends React.Component {
     }
 
     handleChange(e, projectKey, key){
-        let newVal = this.state.projects
+        let newVal = this.props.projects
         if (e.target.getAttribute('type') === 'checkbox') {
             newVal[projectKey].environments[key].branch = e.target.checked
         } else {
@@ -267,7 +266,7 @@ class BabyGit extends React.Component {
 
     lockEnvOf(e, projectKey, env){
         e.stopPropagation()
-        let tmpProjects = this.state.projects
+        let tmpProjects = this.props.projects
         if (tmpProjects[projectKey].environments[env].user != localStorage.getItem('bbggui_name') && !this.state.lockInfo && tmpProjects[projectKey].environments[env].is_locked){
             this.setState({
                 lockConfirmation: true,
@@ -282,9 +281,9 @@ class BabyGit extends React.Component {
     }
     
     checkOut(domain, projectKey, key){
-        let url = this.state.projects[projectKey].environments[key].url
-        let branch = this.state.projects[projectKey].environments[key].branch
-        let isLocked = this.state.projects[projectKey].environments[key].is_locked
+        let url = this.props.projects[projectKey].environments[key].url
+        let branch = this.props.projects[projectKey].environments[key].branch
+        let isLocked = this.props.projects[projectKey].environments[key].is_locked
         if(!branch){
             toast.error("Please enter a branch name.", {
                 position: toast.POSITION.TOP_CENTER,
@@ -388,19 +387,19 @@ class BabyGit extends React.Component {
      * @param {Event} e 
      */
     confirmLocking(e){
-        eNotify.notify({ title: 'Notification title', text: 'Some text' });
         this.confirmLockOf(this.state.lockInfo.projectKey, this.state.lockInfo.env)
+        // Request Unlock
         this.hideLockConfirmation()
     }
 
     confirmLockOf(projectKey, env){
-        let tmpProjects = this.state.projects
+        let tmpProjects = this.props.projects
         this.setState({
             isLoading: true,
             lockInfo: null
         })
         tmpProjects[projectKey].environments[env].is_locked = !tmpProjects[projectKey].environments[env].is_locked
-        this.props.lockEnvOf(projectKey, env, tmpProjects[projectKey].environments[env].is_locked)
+        // this.props.lockEnvOf(projectKey, env, tmpProjects[projectKey].environments[env].is_locked)
         this.setState({ isLoading: false })
     }
 
