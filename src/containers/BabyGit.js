@@ -30,6 +30,7 @@ class BabyGit extends React.Component {
 
         let envUsersRef = firebase.database().ref('env_users')
         envUsersRef.on('value', (snapshot) => {
+            this.props.setEnvUsers(snapshot.val())
             new Notification('Unlock Request', {
                 body: 'Test wants to unlock PassportUSA\'s dev environment'
             })
@@ -140,6 +141,24 @@ class BabyGit extends React.Component {
         if (environment.is_locked) return <span className="tag">In Use</span>
     }
 
+    renderUser(user){
+        return (
+            <div className="user">
+                <div className="name">
+                    { user }
+                    </div>
+                <div className="actions">
+                    <button type="button" className="is-danger">
+                        Remove
+                    </button>
+                    <button type="button" className="is-success">
+                        Pass
+                    </button>
+                </div>
+            </div>
+        )
+    }
+
     renderEnvironmentsOf(project, projectKey){
         return _.map(project.environments, (environment, key) => {
             return (
@@ -180,45 +199,7 @@ class BabyGit extends React.Component {
                                 <div className="title">
                                     Requests
                                 </div>
-                                <div className="user">
-                                    <div className="name">
-                                        Joshua
-                                    </div>
-                                    <div className="actions">
-                                        <button type="button" className="is-danger">
-                                            Remove
-                                        </button>
-                                        <button type="button" className="is-success">
-                                            Pass
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="user">
-                                    <div className="name">
-                                        Joshua
-                                    </div>
-                                    <div className="actions">
-                                        <button type="button" className="is-danger">
-                                            Remove
-                                        </button>
-                                        <button type="button" className="is-success">
-                                            Pass
-                                        </button>
-                                    </div>
-                                </div>
-                                <div className="user">
-                                    <div className="name">
-                                        Joshua
-                                    </div>
-                                    <div className="actions">
-                                        <button type="button" className="is-danger">
-                                            Remove
-                                        </button>
-                                        <button type="button" className="is-success">
-                                            Pass
-                                        </button>
-                                    </div>
-                                </div>
+                                { this.props.envUsers != {} ? this.props.envUsers[projectKey].environments[key].map(this.renderUser) : {} }
                             </div>
                         </div>
                     </div>
@@ -443,7 +424,8 @@ class BabyGit extends React.Component {
 function mapStateToProps(state){
     return {
         apiKey: state.babygit.apiKey,
-        projects: state.babygit.projects
+        projects: state.babygit.projects,
+        envUsers: state.babygit.envUsers
     }
 }
 

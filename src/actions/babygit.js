@@ -33,6 +33,13 @@ export function setProjects(projects){
     }
 }
 
+export function setEnvUsers(users){
+    return {
+        type: Types.SET_ENV_USERS,
+        payload: users
+    }
+}
+
 export function addQueue(project) {
     let ref = firebase.database().ref(`env_users/${project}/environments/${env}`)
         .update(

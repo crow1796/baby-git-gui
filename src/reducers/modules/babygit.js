@@ -13,7 +13,11 @@ const reducer = (state = initialState, action) => {
                 ...state,
                 projects: action.payload
             }
-            break;
+        case Types.SET_ENV_USERS:
+            return {
+                ...state,
+                envUsers: action.payload
+            }
         default:
             return state
     }
