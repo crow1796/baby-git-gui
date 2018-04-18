@@ -14,6 +14,7 @@ const reducer = (state = initialState, action) => {
                 projects: action.payload
             }
         case Types.SET_ENV_USERS:
+            console.log(action.payload)
             return {
                 ...state,
                 envUsers: action.payload
