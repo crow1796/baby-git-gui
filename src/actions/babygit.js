@@ -33,18 +33,34 @@ export function setProjects(projects){
     }
 }
 
-export function setEnvUsers(users){
+export function addToQueueOf(project, env) {
+    let ref = firebase.database().ref(`env_users/${project}/environments/${env}`)
+        .push(localStorage.getItem('bbggui_name'))
     return {
-        type: Types.SET_ENV_USERS,
-        payload: users
+        type: Types.ADD_TO_QUEUE_OF,
+        payload: ref
     }
 }
 
-export function addQueue(project) {
-    let ref = firebase.database().ref(`env_users/${project}/environments/${env}`)
+export function removeQueuedUserFrom(userKey, projectKey, envKey){
+    let ref = firebase.database().ref(`env_users/${projectKey}/environments/${envKey}/${userKey}`).remove()
+    
+    return {
+        type: Types.REMOVE_QUEUED_USER_FROM,
+        payload: ref
+    }
+}
+
+export function passToUser(user, userKey, projectKey, envKey){
+    let ref = firebase.database().ref(`projects/${projectKey}/environments/${envKey}`)
         .update(
             {
-                is_locked: newVal,
-                user: newVal ? localStorage.getItem('bbggui_name') : ''
+                is_locked: true,
+                user: user
             })
+    firebase.database().ref(`env_users/${projectKey}/environments/${envKey}/${userKey}`).remove()
+    return {
+        type: Types.PASS_TO_USER,
+        payload: ref
+    }
 }
