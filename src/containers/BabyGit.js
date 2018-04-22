@@ -8,6 +8,42 @@ import Rodal from 'rodal'
 import 'rodal/lib/rodal.css'
 const { session } = window.require('electron').remote
 
+const Spinner = (props) => {
+    if(!props.loading) return false
+    return (
+        <div className="loader loader--style1" title="0">
+            <svg version="1.1" id="loader-1" x="0px" y="0px"
+            width="40px" height="40px" viewBox="0 0 40 40" enableBackground="new 0 0 40 40">
+            <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
+                s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
+                c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z"/>
+            <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
+                C22.32,8.481,24.301,9.057,26.013,10.047z">
+                <animateTransform attributeType="xml"
+                attributeName="transform"
+                type="rotate"
+                from="0 20 20"
+                to="360 20 20"
+                dur="0.5s"
+                repeatCount="indefinite"/>
+                </path>
+            </svg>
+        </div>
+    )
+}
+
+const CheckOutButton = (props) => {
+    if (props.environment.is_locked && localStorage.getItem('bbggui_name') != props.environment.user) return ''
+    return (
+        <button
+            type="button"
+            className="button"
+            onClick={(e) => props.onClick(props.environment.domain, props.project, props.envKey)}>
+            Checkout
+            </button>
+    )
+}
+
 class BabyGit extends React.Component {
     constructor(props){
         super(props)
@@ -15,9 +51,10 @@ class BabyGit extends React.Component {
             isLoading: true,
             projects: {},
             namePrompt: false,
-            name: '',
+            name: localStorage.getItem('bbggui_name') ? localStorage.getItem('bbggui_name') : '',
             lockConfirmation: false,
-            lockInfo: null
+            lockInfo: null,
+            queues: {}
         }
         let ref = firebase.database().ref('projects')
         ref.on('value', (snapshot) => {
@@ -28,16 +65,55 @@ class BabyGit extends React.Component {
         })
         ref.once('value', (snapshot) => this.__initAccordion())
 
-        let envUsersRef = firebase.database().ref('env_users')
-        envUsersRef.on('value', (snapshot) => {
-            this.props.setEnvUsers(snapshot.val())
-            new Notification('Unlock Request', {
-                body: 'Test wants to unlock PassportUSA\'s dev environment'
-            })
+        let envUsersRef = firebase.database()
+                                    .ref('env_users')
+        envUsersRef.on('child_added', (snapshot) => {
+            envUsersRef.child(`${snapshot.key}/environments`)
+                        .on('child_added', (cSnapshot) => {
+                            envUsersRef.child(`${snapshot.key}/environments/${cSnapshot.key}`)
+                                        .on('child_added', (gSnapshot) => {
+                                            let projectKey = snapshot.key
+                                            let envKey = cSnapshot.key
+                                            let newRequest = gSnapshot.val()
+                                            let queues = JSON.parse(JSON.stringify(this.state.queues))
+                                            _.set(queues, `${projectKey}.${envKey}`, {
+                                                ..._.get(queues, `${projectKey}.${envKey}`) || {},
+                                                [gSnapshot.key]: newRequest
+                                            })
+
+                                            this.setState({
+                                                queues
+                                            })
+                                            
+                                            if (newRequest == this.state.name) return false
+                                            new Notification('Unlock Request', {
+                                                body: `${gSnapshot.val()} wants to unlock ${snapshot.val().name}'s ${cSnapshot.key} environment`
+                                            })
+                                        })
+                            envUsersRef.child(`${snapshot.key}/environments/${cSnapshot.key}`)
+                                        .on('child_removed', (gSnapshot) => {
+                                            let queues = JSON.parse(JSON.stringify(this.state.queues))
+                                            delete queues[snapshot.key][cSnapshot.key][gSnapshot.key]
+
+                                            this.setState({
+                                                queues
+                                            })
+                                        })
+                            envUsersRef.child(`${snapshot.key}/environments/${cSnapshot.key}`)
+                                .on('value', (gSnapshot) => {
+                                    let queues = JSON.parse(JSON.stringify(this.state.queues))
+                                    queues[snapshot.key][cSnapshot.key] = gSnapshot.val()
+
+                                    this.setState({
+                                        queues
+                                    })
+                                })
+                        })
         })
         
         this.hideNamePrompt = this.hideNamePrompt.bind(this)
         this.hideLockConfirmation = this.hideLockConfirmation.bind(this)
+        this.checkOut = this.checkOut.bind(this)
         this.confirmLocking = this.confirmLocking.bind(this)
         this.handleNameChange = this.handleNameChange.bind(this)
         this.saveName = this.saveName.bind(this)
@@ -125,37 +201,72 @@ class BabyGit extends React.Component {
         })
     }
 
-    renderCheckoutButtonOf(projectKey, environment, key){
-        if (environment.is_locked) return ''
+    renderInUseOf(environment){
+        if (environment.is_locked) return <span className="tag">In Use By <strong>{environment.user == this.state.name ? 'You' : environment.user }</strong></span>
+    }
+
+    renderQueuesOf(projectKey, envKey){
+        let queues = _.get(this.state.queues, `${projectKey}.${envKey}`)
+        if (!queues || _.isEmpty(queues)) return false
+        
         return (
-            <button
-                type="button"
-                className="button"
-                onClick={(e) => this.checkOut(environment.domain, projectKey, key)}>
-                Checkout
-            </button>
+            <span className="tag -is-danger">{ Object.keys(queues).length } Queue</span>
         )
     }
 
-    renderInUseOf(environment){
-        if (environment.is_locked) return <span className="tag">In Use</span>
+    renderRemoveButton(index, projectKey, envKey){
+        return (
+            this.state.queues[projectKey][envKey][index] == this.state.name ? 
+            <button type="button"
+                className="is-danger"
+                onClick={(e) => this.removeQueuedUserFrom(index, projectKey, envKey)}>
+                Remove
+            </button> : false
+        )
+    }
+    
+    renderPassButton(index, projectKey, envKey){
+        return (
+            (this.props.projects[projectKey].environments[envKey].user == this.state.name) ?
+                <button type="button"
+                    className="is-success"
+                    onClick={(e) => this.passToUser(index, projectKey, envKey)}>
+                    Pass
+            </button> : false
+        )
     }
 
-    renderUser(user){
+    renderRequests(projectKey, envKey) {
+        let queues = _.get(this.state.queues, `${projectKey}.${envKey}`)
+        if(!queues || _.isEmpty(queues)) return false
         return (
-            <div className="user">
-                <div className="name">
-                    { user }
-                    </div>
-                <div className="actions">
-                    <button type="button" className="is-danger">
-                        Remove
-                    </button>
-                    <button type="button" className="is-success">
-                        Pass
-                    </button>
+            <div className="environment-requests">
+                <div className="title">
+                    Requests
                 </div>
+                { _.map(queues, (user, index) => {
+                    return (
+                        <div className={`user ${this.state.queues[projectKey][envKey][index] != this.state.name && this.props.projects[projectKey].environments[envKey].user != this.state.name ? '-is-empty' : ''}` } key={index}>
+                            <div className="name">
+                                {user}
+                            </div>
+                            <div className="actions">
+                                { this.renderRemoveButton(index, projectKey, envKey) }
+                                {this.renderPassButton(index, projectKey, envKey) }
+                            </div>
+                        </div>
+                    )
+                }) }
             </div>
+        )
+    }
+
+    renderCurrentUserOf(environment){
+        if(!environment.is_locked) return false
+        return (
+            <span className="user-name" title={environment.user}>
+                { environment.user }
+            </span>
         )
     }
 
@@ -166,7 +277,7 @@ class BabyGit extends React.Component {
                     <div className="accordion-header js-accordion-header">
                         { environment.name }
                         { this.renderInUseOf(environment) }
-                        < span className="tag -is-danger">2 Requests</span>
+                        { this.renderQueuesOf(projectKey, key) }
                     </div>
                     <div className="accordion-body js-accordion-body">
                         <div className="accordion-body__contents">
@@ -177,30 +288,25 @@ class BabyGit extends React.Component {
                                 name={ key }
                                 value={ this.props.projects[projectKey].environments[key].branch }
                                 onChange={(e) => this.handleChange(e, projectKey, key) }
-                                disabled={ environment.is_locked }/>
+                                disabled={ environment.is_locked && (environment.user != this.state.name) }/>
                                 <button type="button" 
-                                    className={environment.is_locked ? 'button -is-white -fill' : 'button -is-white' } 
+                                    className={environment.is_locked && this.state.name != environment.user ? 'button -is-white -fill' : 'button -is-white' } 
                                 onClick={(e) => this.lockEnvOf(e, projectKey, key)}>
-                                    < div className = {
+                                    <div className={
                                         environment.is_locked ? 'icon-lock' : 'icon-lock -unlocked'
-                                    } >
+                                    }>
                                         <div className="lock-top-1"></div>
                                         <div className="lock-top-2"></div>
                                         <div className="lock-body"></div>
                                         <div className="lock-hole"></div>
                                     </div>
-                                    <span className="user-name" title={environment.user}>
-                                        { environment.user }
-                                    </span>
                                 </button>
-                                { this.renderCheckoutButtonOf(projectKey, environment, key) }
+                                <CheckOutButton project={projectKey}
+                                    environment={environment}
+                                    envKey={key}
+                                    onClick={this.checkOut} />
                             </div>
-                            <div className="environment-requests">
-                                <div className="title">
-                                    Requests
-                                </div>
-                                { this.props.envUsers != {} ? this.props.envUsers[projectKey].environments[key].map(this.renderUser) : {} }
-                            </div>
+                            {this.renderRequests(projectKey, key)}
                         </div>
                     </div>
                 </div>
@@ -220,31 +326,6 @@ class BabyGit extends React.Component {
         })
     }
 
-    spinner(){
-        if(this.state.isLoading){
-            return (
-                <div className="loader loader--style1" title="0">
-                    <svg version="1.1" id="loader-1" x="0px" y="0px"
-                    width="40px" height="40px" viewBox="0 0 40 40" enableBackground="new 0 0 40 40">
-                    <path opacity="0.2" fill="#000" d="M20.201,5.169c-8.254,0-14.946,6.692-14.946,14.946c0,8.255,6.692,14.946,14.946,14.946
-                        s14.946-6.691,14.946-14.946C35.146,11.861,28.455,5.169,20.201,5.169z M20.201,31.749c-6.425,0-11.634-5.208-11.634-11.634
-                        c0-6.425,5.209-11.634,11.634-11.634c6.425,0,11.633,5.209,11.633,11.634C31.834,26.541,26.626,31.749,20.201,31.749z"/>
-                    <path fill="#000" d="M26.013,10.047l1.654-2.866c-2.198-1.272-4.743-2.012-7.466-2.012h0v3.312h0
-                        C22.32,8.481,24.301,9.057,26.013,10.047z">
-                        <animateTransform attributeType="xml"
-                        attributeName="transform"
-                        type="rotate"
-                        from="0 20 20"
-                        to="360 20 20"
-                        dur="0.5s"
-                        repeatCount="indefinite"/>
-                        </path>
-                    </svg>
-                </div>
-            )
-        }
-    }
-
     lockEnvOf(e, projectKey, env){
         e.stopPropagation()
         let tmpProjects = this.props.projects
@@ -258,7 +339,8 @@ class BabyGit extends React.Component {
             })
             return false
         }
-        this.confirmLockOf(projectKey, env)
+        tmpProjects[projectKey].environments[env].is_locked = !tmpProjects[projectKey].environments[env].is_locked
+        this.props.lockEnvOf(projectKey, env, tmpProjects[projectKey].environments[env].is_locked)
     }
     
     checkOut(domain, projectKey, key){
@@ -297,7 +379,7 @@ class BabyGit extends React.Component {
                 this.setState({ isLoading: false })
             })
             .catch((response) => {
-                toast.error(`Error: ${response.message}. Please try again.`, {
+                toast.error(`Error: ${response.message}. Please try again. Server Response: ${response.data}`, {
                     position: toast.POSITION.TOP_CENTER,
                     closeButton: false,
                     hideProgressBar: true,
@@ -368,20 +450,43 @@ class BabyGit extends React.Component {
      * @param {Event} e 
      */
     confirmLocking(e){
-        this.confirmLockOf(this.state.lockInfo.projectKey, this.state.lockInfo.env)
-        // Request Unlock
-        this.hideLockConfirmation()
-    }
-
-    confirmLockOf(projectKey, env){
+        let projectKey = this.state.lockInfo.projectKey
+        let env = this.state.lockInfo.env
+        
         let tmpProjects = this.props.projects
         this.setState({
             isLoading: true,
             lockInfo: null
         })
-        tmpProjects[projectKey].environments[env].is_locked = !tmpProjects[projectKey].environments[env].is_locked
-        // this.props.lockEnvOf(projectKey, env, tmpProjects[projectKey].environments[env].is_locked)
-        this.setState({ isLoading: false })
+        
+        this.setState({
+            isLoading: false
+        })
+        this.hideLockConfirmation()
+
+        let devQueues = _.get(this.state.queues, `${projectKey}.${env}`)
+        devQueues = _.map(devQueues, (user, index) => {
+            return {
+                name: user,
+                key: index
+            }
+        })
+        let found = _.find(devQueues, {
+            name: this.state.name
+        })
+        if(found) return false
+        // if(found) this.removeQueuedUserFrom(found.key, projectKey, env)
+        this.props.addToQueueOf(projectKey, env)
+    }
+
+    removeQueuedUserFrom(userKey, projectKey, envKey){
+        this.props.removeQueuedUserFrom(userKey, projectKey, envKey)
+    }
+
+    passToUser(userKey, projectKey, envKey){
+        let queues = _.get(this.state.queues, `${projectKey}.${envKey}`)
+        if (!queues || _.isEmpty(queues)) return false
+        this.props.passToUser(queues[userKey], userKey, projectKey, envKey)
     }
 
     renderLockConfirmation(){
@@ -412,7 +517,7 @@ class BabyGit extends React.Component {
         return (
             <div id="baby-git">
                 <ToastContainer />
-                { this.spinner() }
+                <Spinner loading={ this.state.isLoading }/>
                 { this.renderProjects() }
                 { this.renderNamePromptModal() }
                 { this.renderLockConfirmation() }
@@ -424,8 +529,7 @@ class BabyGit extends React.Component {
 function mapStateToProps(state){
     return {
         apiKey: state.babygit.apiKey,
-        projects: state.babygit.projects,
-        envUsers: state.babygit.envUsers
+        projects: state.babygit.projects
     }
 }
 

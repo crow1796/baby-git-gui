@@ -1,5 +1,6 @@
 export const SET_PROJECTS = 'SET_PROJECTS'
 export const UPDATE_BRANCH = 'UPDATE_BRANCH'
 export const LOCK_ENV = 'LOCK_ENV'
-export const ADD_QUEUE = 'ADD_QUEUE'
-export const SET_ENV_USERS = 'SET_ENV_USERS'
+export const ADD_TO_QUEUE_OF = 'ADD_TO_QUEUE_OF'
+export const REMOVE_QUEUED_USER_FROM = 'REMOVE_QUEUED_USER_FROM'
+export const PASS_TO_USER = 'PASS_TO_USER'
