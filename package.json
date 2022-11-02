@@ -40,7 +40,7 @@
     "cross-env": "^5.1.4",
     "css-loader": "^0.28.11",
     "electron": "^1.8.4",
-    "electron-builder": "^20.8.1",
+    "electron-builder": "^20.44.4",
     "electron-prebuilt": "^1.4.13",
     "electron-reload": "^1.2.2",
     "file-loader": "^1.1.11",
